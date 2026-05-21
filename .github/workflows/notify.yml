@@ -1,0 +1,25 @@
+name: 経済サマリー通知
+
+on:
+  schedule:
+    - cron: '0 8 * * 1-5'  # UTC 8:00 = JST 17:00 平日のみ
+  workflow_dispatch:        # 手動実行ボタンも有効化
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: 依存パッケージをインストール
+        run: pip install -r requirements.txt
+
+      - name: 通知を実行
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python main.py
